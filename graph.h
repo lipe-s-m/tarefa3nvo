@@ -152,6 +152,9 @@ static inline unsigned int alvo(const NO * r) {
 // Enumeração de conjuntos
 static inline NO partida(CONJ * const R) {
     NO n = {0, 0};
+    while (n.idx < N_NACOS(MAX_VERTICES) && NACO_DE(R->conj, n.idx) == 0) {
+        n.idx++;
+    }
     return n;
 }
 
@@ -169,15 +172,19 @@ static inline NO * avancar(NO * r) {
 }
 
 static inline void imprimir(CONJ * R) {
-    printf("Conjunto com %d elementos.\n{", cardinalidade(R));
+
+    // printf("Conjunto com %d elementos.\n{", cardinalidade(R));
+
     NO r = partida(R);
     while (!chegada(&r)) {
         if (pertence(alvo(&r), R)) {
-            printf("%d,", alvo(&r));
+            // printf("%d,", alvo(&r));
         }
         avancar(&r);
+
     }
-    printf("}\n");
+    // printf("}\n");
+
 }
 
 static inline void retirar_do_conjunto(NO * r) {
@@ -243,7 +250,13 @@ unsigned long n_arestas(const GRAFO * g) {
 }
 
 void imprimir_grafo(const GRAFO * g) {
+
 	printf("Grafo com %d vértices e %ld arestas.\n", g->nvert, n_arestas(g));
+
+    for (int i = 0; i < g->nvert; i++) {
+        // printf("%d -> ", i);
+        imprimir((CONJ *)&g->viz[i]);
+    }
 }
 
 

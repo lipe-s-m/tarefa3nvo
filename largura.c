@@ -15,7 +15,7 @@
 // Função para percorrer um grafo com percurso em largura
 void percurso_largura(const GRAFO * g, unsigned int r, CONJ * A, CONJ * B) {
     unsigned int F[amplitude(g)];
-    unsigned int i = 0,f = 0;
+    unsigned int i = 0, f = 0;
 
     esvaziar(A);
     esvaziar(B);
@@ -24,18 +24,24 @@ void percurso_largura(const GRAFO * g, unsigned int r, CONJ * A, CONJ * B) {
     incluir(r, A);
 
     while (i < f) {
-    	unsigned int u = F[i++];
-    	copiar(vizinhos(g, u), B);
-    	suprimir(B, A);
-    	agregar(A, B);
+        // printf("entreri no while, i = %d f = %d\n \n", i, f);
+        unsigned int u = F[i++];
+        copiar(vizinhos(g, u), B);
+        suprimir(B, A);
+        agregar(A, B);
 
-    	NO w = partida(B);
-    	while (!chegada(&w)) {
-    		F[f++] = alvo(&w);
-    		avancar(&w);
-    	}
+        NO w = partida(B);
+        while (!chegada(&w)) {
+            // printf("i eh ->%d /// F  eh ->%d\n", i, f);
+
+            F[f++] = alvo(&w);
+            avancar(&w);
+            // printf("FIM AVANCAR ");
+        }
     }
+    // printf(" FIM DA FUNCAO ");
 }
+
 
 // Função para medir o tempo de execução médio da função verifica_clique
 double medir_tempo_execucao(const GRAFO * g, int repeticoes) {
@@ -45,14 +51,18 @@ double medir_tempo_execucao(const GRAFO * g, int repeticoes) {
     CONJ B = conjunto(amplitude(g));
 
     inicio = clock();
-    for (int i = 0; i < repeticoes; i++)
-    	percurso_largura(g, 0, &A, &B);
+    // printf(" antes do for, repeticoes e %d\n", repeticoes);
+    for (int i = 0; i < repeticoes; i++) {
+        // printf("\nvezes dentro do for %d \n", i);
+        percurso_largura(g, 0, &A, &B);
+    }
+    // printf("fim do for");
+
     fim = clock();
     double tempoTotal = (double)(fim - inicio) / CLOCKS_PER_SEC;
 
-	apagar(&B);
-	apagar(&A);
-
+    apagar(&B);
+    apagar(&A);
     return tempoTotal / repeticoes;
 }
 
@@ -62,7 +72,7 @@ double* estimar_tempo_execucao(int from, int to, int by, int nsamples, double de
     double* tempos = malloc(((to - from) / by + 1) * sizeof(double));
 
     printf("Estimar tempo médio de execução\nfrom: %d\nto: %d\nby: %d\nnsamples: %d\ndens: %f\nnrep: %d\nr: %f\n",
-    		from, to, by, nsamples, dens, nrep, r);
+        from, to, by, nsamples, dens, nrep, r);
     fflush(NULL);
 
     int currentIndex = 0;
@@ -75,7 +85,7 @@ double* estimar_tempo_execucao(int from, int to, int by, int nsamples, double de
         for (int i = 0; i < nsamples; i++) {
             GRAFO g = grafo_aleatorio(numVertices, dens);
             imprimir_grafo(&g);
-            
+
             tempoTotal += medir_tempo_execucao(&g, nrep);
             apagar_grafo(&g);
         }
@@ -98,24 +108,24 @@ int main() {
     // Define a semente para geração de números aleatórios
     srand(time(NULL));
 
-    printf("Parâmetros do experimento:\nMAX_VERTICES: %d\nLOG_MAX_VERTICES: %d\nNBITS_NACO: %d\nLOG_NBITS_NACO: %d\n\n\n",
-    		MAX_VERTICES,
-			LOG_MAX_VERTICES,
-			NBITS_NACO,
-			LOG_NBITS_NACO);
+    printf("Parametros do experimento:\nMAX_VERTICES: %d\nLOG_MAX_VERTICES: %d\nNBITS_NACO: %d\nLOG_NBITS_NACO: %d\n\n\n",
+        MAX_VERTICES,
+        LOG_MAX_VERTICES,
+        NBITS_NACO,
+        LOG_NBITS_NACO);
 
-    printf("Tempo médio de execução:\n");
+    printf("Tempo medio de execução:\n");
     for(double dens = 0.25; dens <= 1; dens += 0.25) { // Densidade esperada dos grafos
-    	if (dens == 1)
-    		dens = 0.95;
-    	double* tempos = estimar_tempo_execucao(from, to, by, nsamples, dens, nrep, r);
-    	int currentIndex = 0;
-    	for (int n = from; n <= to; n += by) {
-    		printf("Número de vértices: %d, Densidade: %f, Tempo: %e segundos\n", n, dens, tempos[currentIndex]);
-    		currentIndex++;
-    	}
+        if (dens == 1)
+            dens = 0.95;
+        double* tempos = estimar_tempo_execucao(from, to, by, nsamples, dens, nrep, r);
+        int currentIndex = 0;
+        for (int n = from; n <= to; n += by) {
+            printf("Numero de vertices: %d, Densidade: %f, Tempo: %e segundos\n", n, dens, tempos[currentIndex]);
+            currentIndex++;
+        }
 
-    	free(tempos);
+        free(tempos);
     }
 
     return 0;
